@@ -1,0 +1,35 @@
+# Python
+venv/
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+dist/
+*.egg-info/
+
+# Django
+*.log
+db.sqlite3
+media/
+staticfiles/
+htmlcov/
+.coverage
+.pytest_cache/
+
+# Environment
+.env
+.env.local
+.env.*.local
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+
+# Test
+.tox/

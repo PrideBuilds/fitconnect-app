@@ -1,0 +1,8 @@
+{
+  "bio": "I am a passionate fitness trainer with expertise in strength training and nutrition. I help clients achieve their fitness goals through personalized workout plans.",
+  "years_experience": 5,
+  "specialization_ids": [9, 6],
+  "address": "San Francisco, CA",
+  "service_radius_miles": 15,
+  "hourly_rate": 85
+}

@@ -1,0 +1,32 @@
+Hi {{ client_name }},
+
+Your training session booking has been submitted!
+
+Booking Details:
+----------------
+Trainer: {{ trainer_name }}
+Date: {{ session_date|date:"l, F j, Y" }}
+Time: {{ start_time|time:"g:i A" }} - {{ end_time|time:"g:i A" }} ({{ duration_minutes }} minutes)
+Location: {{ location_address }}
+Total Price: ${{ total_price }}
+
+{% if client_notes %}
+Your Notes: {{ client_notes }}
+{% endif %}
+
+Status: {{ status_display }}
+
+{% if status == 'pending' %}
+Your booking is pending confirmation from the trainer. You'll receive another email once the trainer confirms your session.
+{% elif status == 'confirmed' %}
+Your booking has been confirmed! Get ready for your training session.
+{% endif %}
+
+Need to cancel? You can cancel free of charge up to 24 hours before the session.
+View your booking: {{ site_url }}/bookings
+
+Thanks for using {{ site_name }}!
+
+---
+The FitConnect Team
+{{ site_url }}
