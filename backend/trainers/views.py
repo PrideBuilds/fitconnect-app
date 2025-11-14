@@ -32,6 +32,17 @@ class SpecializationListView(generics.ListAPIView):
     permission_classes = []  # Public endpoint
 
 
+class TrainerListView(generics.ListAPIView):
+    """
+    GET /api/v1/trainers/
+    List all trainer profiles
+    """
+    queryset = TrainerProfile.objects.select_related('user').all()
+    serializer_class = TrainerProfilePublicSerializer
+    permission_classes = [IsAuthenticated]  # Require authentication
+    pagination_class = PageNumberPagination
+
+
 class TrainerProfileView(APIView):
     """
     GET /api/v1/trainers/profile/

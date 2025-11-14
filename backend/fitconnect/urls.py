@@ -34,4 +34,5 @@ urlpatterns = [
     path('api/v1/users/', include('users.urls')),
     path('api/v1/trainers/', include('trainers.urls')),
     path('api/v1/bookings/', include('bookings.urls')),
+    path('api/v1/admin/', include('admin_api.urls')),
 ]

@@ -197,6 +197,7 @@ class BookingListSerializer(serializers.ModelSerializer):
             'end_time',
             'duration_minutes',
             'location_address',
+            'hourly_rate',
             'total_price',
             'status',
             'status_display',

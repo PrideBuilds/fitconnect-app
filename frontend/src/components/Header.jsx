@@ -50,6 +50,16 @@ const Header = () => {
       ]
     }
 
+    if (user.role === 'admin') {
+      return [
+        { label: 'Admin Dashboard', path: ROUTES.ADMIN_DASHBOARD },
+        { label: 'Manage Users', path: ROUTES.ADMIN_USERS },
+        { label: 'Approve Trainers', path: ROUTES.ADMIN_TRAINERS },
+        { label: 'View Bookings', path: ROUTES.ADMIN_BOOKINGS },
+        ...commonItems,
+      ]
+    }
+
     return commonItems
   }
 
@@ -90,7 +100,10 @@ const Header = () => {
               <div className="flex items-center space-x-4 ml-4 pl-4 border-l border-gray-200">
                 <div className="flex items-center space-x-2">
                   <span className="text-gray-700 font-medium">{user.username}</span>
-                  <Badge variant={user.role === 'trainer' ? 'primary' : 'secondary'} size="sm">
+                  <Badge
+                    variant={user.role === 'admin' ? 'danger' : user.role === 'trainer' ? 'primary' : 'secondary'}
+                    size="sm"
+                  >
                     {user.role}
                   </Badge>
                 </div>
@@ -160,7 +173,10 @@ const Header = () => {
                 <div className="pt-4 border-t border-gray-100 mt-4">
                   <div className="flex items-center space-x-2 px-3 pb-3">
                     <span className="text-gray-700 font-medium">{user.username}</span>
-                    <Badge variant={user.role === 'trainer' ? 'primary' : 'secondary'} size="sm">
+                    <Badge
+                      variant={user.role === 'admin' ? 'danger' : user.role === 'trainer' ? 'primary' : 'secondary'}
+                      size="sm"
+                    >
                       {user.role}
                     </Badge>
                   </div>

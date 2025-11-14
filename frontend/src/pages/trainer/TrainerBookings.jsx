@@ -329,7 +329,7 @@ const TrainerBookings = () => {
                         ${parseFloat(booking.total_price).toFixed(2)}
                       </div>
                       <div className="text-sm text-gray-600">
-                        ${parseFloat(booking.hourly_rate).toFixed(0)}/hr × {booking.duration_minutes}min
+                        ${booking.hourly_rate ? parseFloat(booking.hourly_rate).toFixed(0) : '0'}/hr × {booking.duration_minutes}min
                       </div>
                     </div>
                   </div>

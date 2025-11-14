@@ -28,6 +28,12 @@ import TrainerAvailability from './pages/trainer/TrainerAvailability'
 // Trainer components
 import ProfileWizard from './components/profile/ProfileWizard'
 
+// Admin pages
+import AdminDashboard from './pages/admin/AdminDashboard'
+import AdminUsers from './pages/admin/AdminUsers'
+import AdminTrainers from './pages/admin/AdminTrainers'
+import AdminBookings from './pages/admin/AdminBookings'
+
 /**
  * Main App Component
  * Sets up routing and authentication context
@@ -121,6 +127,40 @@ function App() {
               element={
                 <ProtectedRoute>
                   <ProfileSettings />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* Protected Routes - Admin Only */}
+            <Route
+              path={ROUTES.ADMIN_DASHBOARD}
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminDashboard />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.ADMIN_USERS}
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminUsers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.ADMIN_TRAINERS}
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminTrainers />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path={ROUTES.ADMIN_BOOKINGS}
+              element={
+                <ProtectedRoute requiredRole="admin">
+                  <AdminBookings />
                 </ProtectedRoute>
               }
             />

@@ -43,7 +43,8 @@ class TrainerProfileSerializer(serializers.ModelSerializer):
     """Detailed trainer profile serializer (for trainer's own profile)"""
 
     user = serializers.SerializerMethodField()
-    location = GeometryField()  # Returns GeoJSON format
+    user_email = serializers.EmailField(source='user.email', read_only=True)
+    location = GeometryField(required=False, allow_null=True)  # Auto-geocoded from address
     specializations = SpecializationSerializer(many=True, read_only=True)
     specialization_ids = serializers.PrimaryKeyRelatedField(
         many=True,
@@ -59,6 +60,7 @@ class TrainerProfileSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'user',
+            'user_email',
             'bio',
             'years_experience',
             'address',

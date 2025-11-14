@@ -27,6 +27,12 @@ export const ROUTES = {
   PROFILE_SETTINGS: '/settings',
   HELP: '/help',
   ABOUT: '/about',
+
+  // Admin routes
+  ADMIN_DASHBOARD: '/admin/dashboard',
+  ADMIN_USERS: '/admin/users',
+  ADMIN_TRAINERS: '/admin/trainers',
+  ADMIN_BOOKINGS: '/admin/bookings',
 }
 
 /**
