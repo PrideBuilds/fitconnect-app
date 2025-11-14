@@ -201,7 +201,10 @@ class TrainerSearchView(APIView):
     - specializations (comma-separated): Filter by specialization IDs or slugs
     - min_price (float): Minimum hourly rate
     - max_price (float): Maximum hourly rate
+    - min_rating (float): Minimum average rating (0-5)
+    - min_experience (int): Minimum years of experience
     - verified_only (bool): Show only verified trainers (default: false)
+    - sort_by (string): Sort results by 'distance', 'price_asc', 'price_desc', 'rating', 'experience' (default: distance)
     - page (int): Page number for pagination
     - page_size (int): Number of results per page (max: 50)
 
@@ -224,7 +227,10 @@ class TrainerSearchView(APIView):
         specializations = request.query_params.get('specializations', '')
         min_price = request.query_params.get('min_price')
         max_price = request.query_params.get('max_price')
+        min_rating = request.query_params.get('min_rating')
+        min_experience = request.query_params.get('min_experience')
         verified_only = request.query_params.get('verified_only', 'false').lower() == 'true'
+        sort_by = request.query_params.get('sort_by', 'distance')
 
         # Validate and get location point
         location_point = None
@@ -300,6 +306,31 @@ class TrainerSearchView(APIView):
                 queryset = queryset.filter(hourly_rate__lte=float(max_price))
             except ValueError:
                 pass  # Ignore invalid max_price
+
+        # Filter by minimum rating
+        if min_rating:
+            try:
+                queryset = queryset.filter(average_rating__gte=float(min_rating))
+            except ValueError:
+                pass  # Ignore invalid min_rating
+
+        # Filter by minimum experience
+        if min_experience:
+            try:
+                queryset = queryset.filter(years_experience__gte=int(min_experience))
+            except ValueError:
+                pass  # Ignore invalid min_experience
+
+        # Apply sorting
+        if sort_by == 'price_asc':
+            queryset = queryset.order_by('hourly_rate', 'distance')
+        elif sort_by == 'price_desc':
+            queryset = queryset.order_by('-hourly_rate', 'distance')
+        elif sort_by == 'rating':
+            queryset = queryset.order_by('-average_rating', 'distance')
+        elif sort_by == 'experience':
+            queryset = queryset.order_by('-years_experience', 'distance')
+        # else: already ordered by distance (line 277)
 
         # Prefetch related data to avoid N+1 queries
         queryset = queryset.select_related('user').prefetch_related(

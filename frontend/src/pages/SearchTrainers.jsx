@@ -27,7 +27,10 @@ const SearchTrainers = () => {
   const [selectedSpecializations, setSelectedSpecializations] = useState([])
   const [minPrice, setMinPrice] = useState('')
   const [maxPrice, setMaxPrice] = useState('')
+  const [minRating, setMinRating] = useState('')
+  const [minExperience, setMinExperience] = useState('')
   const [verifiedOnly, setVerifiedOnly] = useState(false)
+  const [sortBy, setSortBy] = useState('distance')
 
   // Data state
   const [specializations, setSpecializations] = useState([])
@@ -110,8 +113,20 @@ const SearchTrainers = () => {
         params.append('max_price', maxPrice)
       }
 
+      if (minRating) {
+        params.append('min_rating', minRating)
+      }
+
+      if (minExperience) {
+        params.append('min_experience', minExperience)
+      }
+
       if (verifiedOnly) {
         params.append('verified_only', 'true')
+      }
+
+      if (sortBy && sortBy !== 'distance') {
+        params.append('sort_by', sortBy)
       }
 
       const response = await fetch(
@@ -189,7 +204,7 @@ const SearchTrainers = () => {
         {/* Search Filters */}
         <Card className="mb-8">
           <form onSubmit={handleSearch}>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
               {/* Location */}
               <div>
                 <label htmlFor="location" className="block text-sm font-medium text-gray-700 mb-2">
@@ -269,6 +284,62 @@ const SearchTrainers = () => {
                   min="0"
                   className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
                 />
+              </div>
+
+              {/* Min Rating */}
+              <div>
+                <label htmlFor="minRating" className="block text-sm font-medium text-gray-700 mb-2">
+                  Min Rating
+                </label>
+                <select
+                  id="minRating"
+                  value={minRating}
+                  onChange={(e) => setMinRating(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Any Rating</option>
+                  <option value="3">3+ Stars</option>
+                  <option value="4">4+ Stars</option>
+                  <option value="4.5">4.5+ Stars</option>
+                </select>
+              </div>
+
+              {/* Min Experience */}
+              <div>
+                <label htmlFor="minExperience" className="block text-sm font-medium text-gray-700 mb-2">
+                  Min Experience
+                </label>
+                <select
+                  id="minExperience"
+                  value={minExperience}
+                  onChange={(e) => setMinExperience(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="">Any Experience</option>
+                  <option value="1">1+ Years</option>
+                  <option value="3">3+ Years</option>
+                  <option value="5">5+ Years</option>
+                  <option value="10">10+ Years</option>
+                </select>
+              </div>
+
+              {/* Sort By */}
+              <div>
+                <label htmlFor="sortBy" className="block text-sm font-medium text-gray-700 mb-2">
+                  Sort By
+                </label>
+                <select
+                  id="sortBy"
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-primary-500"
+                >
+                  <option value="distance">Distance</option>
+                  <option value="price_asc">Price: Low to High</option>
+                  <option value="price_desc">Price: High to Low</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="experience">Most Experienced</option>
+                </select>
               </div>
             </div>
 
