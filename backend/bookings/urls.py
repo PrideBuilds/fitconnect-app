@@ -1,7 +1,9 @@
 from django.urls import path
 from .views import (
     BookingListCreateView,
-    BookingDetailView
+    BookingDetailView,
+    ReviewListCreateView,
+    ReviewDetailView
 )
 
 app_name = 'bookings'
@@ -12,4 +14,10 @@ urlpatterns = [
 
     # Booking detail, update, and cancel
     path('<int:booking_id>/', BookingDetailView.as_view(), name='booking-detail'),
+
+    # List all reviews and create new review
+    path('reviews/', ReviewListCreateView.as_view(), name='review-list-create'),
+
+    # Review detail, update, and delete
+    path('reviews/<int:review_id>/', ReviewDetailView.as_view(), name='review-detail'),
 ]

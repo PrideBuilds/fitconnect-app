@@ -16,7 +16,7 @@ import TrainerDetail from './pages/TrainerDetail'
 
 // Client pages
 import ClientDashboard from './pages/client/ClientDashboard'
-import ClientProfile from './pages/client/ClientProfile'
+import ClientFitnessProfile from './pages/client/ClientFitnessProfile'
 import ClientBookings from './pages/client/ClientBookings'
 
 // Trainer pages
@@ -66,7 +66,7 @@ function App() {
               path={ROUTES.CLIENT_PROFILE}
               element={
                 <ProtectedRoute requiredRole="client">
-                  <ClientProfile />
+                  <ClientFitnessProfile />
                 </ProtectedRoute>
               }
             />

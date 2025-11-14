@@ -34,6 +34,7 @@ const Header = () => {
     if (user.role === 'client') {
       return [
         { label: 'Dashboard', path: ROUTES.CLIENT_DASHBOARD },
+        { label: 'My Fitness Profile', path: ROUTES.CLIENT_PROFILE },
         { label: 'Search Trainers', path: ROUTES.SEARCH_TRAINERS },
         { label: 'My Bookings', path: ROUTES.CLIENT_BOOKINGS },
         ...commonItems,

@@ -3,11 +3,13 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.pagination import PageNumberPagination
 from rest_framework.exceptions import PermissionDenied, NotFound, ValidationError
-from .models import Booking
+from .models import Booking, Review
 from .serializers import (
     BookingSerializer,
     BookingCreateSerializer,
-    BookingListSerializer
+    BookingListSerializer,
+    ReviewSerializer,
+    ReviewCreateSerializer
 )
 from .emails import send_booking_notification_emails
 from trainers.models import TrainerProfile
@@ -185,3 +187,120 @@ class BookingDetailView(generics.RetrieveUpdateDestroyAPIView):
 
         serializer = self.get_serializer(booking)
         return Response(serializer.data)
+
+
+class ReviewListCreateView(generics.ListCreateAPIView):
+    """
+    GET /api/v1/bookings/reviews/
+    List reviews (filter by trainer, client, or all visible reviews)
+
+    POST /api/v1/bookings/reviews/
+    Create a new review for a completed booking (client only)
+    """
+    permission_classes = [IsAuthenticated]
+    pagination_class = BookingPagination
+
+    def get_queryset(self):
+        """Filter reviews based on query parameters"""
+        queryset = Review.objects.select_related('trainer__user', 'client', 'booking')
+
+        # Filter by trainer
+        trainer_id = self.request.query_params.get('trainer')
+        if trainer_id:
+            queryset = queryset.filter(trainer_id=trainer_id, is_visible=True)
+
+        # Filter by client (only for authenticated client viewing their own)
+        elif self.request.user.role == 'client':
+            queryset = queryset.filter(client=self.request.user)
+
+        # Default: only visible reviews
+        else:
+            queryset = queryset.filter(is_visible=True)
+
+        return queryset.order_by('-created_at')
+
+    def get_serializer_class(self):
+        """Use different serializers for list vs create"""
+        if self.request.method == 'POST':
+            return ReviewCreateSerializer
+        return ReviewSerializer
+
+    def perform_create(self, serializer):
+        """Create review with validation"""
+        # Only clients can create reviews
+        if self.request.user.role != 'client':
+            raise PermissionDenied('Only clients can create reviews')
+
+        serializer.save()
+
+
+class ReviewDetailView(generics.RetrieveUpdateDestroyAPIView):
+    """
+    GET /api/v1/bookings/reviews/{id}/
+    Get review details
+
+    PATCH /api/v1/bookings/reviews/{id}/
+    Update own review (client only)
+
+    DELETE /api/v1/bookings/reviews/{id}/
+    Delete own review (client only)
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = ReviewSerializer
+    lookup_url_kwarg = 'review_id'
+
+    def get_queryset(self):
+        """Filter reviews - clients can only access their own"""
+        if self.request.user.role == 'client':
+            return Review.objects.filter(client=self.request.user)
+        else:
+            # Trainers and others can view visible reviews
+            return Review.objects.filter(is_visible=True)
+
+    def get_serializer_class(self):
+        """Use create serializer for updates"""
+        if self.request.method in ['PATCH', 'PUT']:
+            return ReviewCreateSerializer
+        return ReviewSerializer
+
+    def update(self, request, *args, **kwargs):
+        """Only allow clients to update their own reviews"""
+        review = self.get_object()
+
+        if request.user != review.client:
+            raise PermissionDenied('You can only update your own reviews')
+
+        return super().update(request, *args, **kwargs)
+
+    def destroy(self, request, *args, **kwargs):
+        """Only allow clients to delete their own reviews"""
+        review = self.get_object()
+
+        if request.user != review.client:
+            raise PermissionDenied('You can only delete your own reviews')
+
+        return super().destroy(request, *args, **kwargs)
+
+
+class TrainerReviewsView(generics.ListAPIView):
+    """
+    GET /api/v1/trainers/{trainer_id}/reviews/
+    Get all visible reviews for a specific trainer
+    """
+    serializer_class = ReviewSerializer
+    pagination_class = BookingPagination
+
+    def get_queryset(self):
+        """Get reviews for specific trainer"""
+        trainer_id = self.kwargs.get('trainer_id')
+
+        # Verify trainer exists
+        try:
+            TrainerProfile.objects.get(id=trainer_id)
+        except TrainerProfile.DoesNotExist:
+            raise NotFound('Trainer not found')
+
+        return Review.objects.filter(
+            trainer_id=trainer_id,
+            is_visible=True
+        ).select_related('client', 'booking').order_by('-created_at')

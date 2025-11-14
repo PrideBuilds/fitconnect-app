@@ -3,7 +3,13 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
 from .models import User, EmailVerificationToken, PasswordResetToken, ClientProfile, TrainerProfile
-from .serializers import UserRegistrationSerializer, UserSerializer, ClientProfileSerializer, TrainerProfileSerializer
+from .serializers import (
+    UserRegistrationSerializer,
+    UserSerializer,
+    ClientProfileSerializer,
+    ClientProfileUpdateSerializer,
+    TrainerProfileSerializer
+)
 from .permissions import IsClient, IsTrainer
 import secrets
 
@@ -201,15 +207,20 @@ class ResetPasswordView(APIView):
 
 
 class ClientProfileView(generics.RetrieveUpdateAPIView):
-    """Get or update current client's profile"""
+    """Get or update current client's comprehensive fitness profile"""
 
     permission_classes = (permissions.IsAuthenticated, IsClient)
-    serializer_class = ClientProfileSerializer
 
     def get_object(self):
-        # Return the client profile for the current user
+        # Return the client profile for the current user (auto-create if doesn't exist)
         profile, created = ClientProfile.objects.get_or_create(user=self.request.user)
         return profile
+
+    def get_serializer_class(self):
+        """Use different serializers for GET vs PUT/PATCH"""
+        if self.request.method in ['PUT', 'PATCH']:
+            return ClientProfileUpdateSerializer
+        return ClientProfileSerializer
 
 
 class TrainerProfileDetailView(generics.RetrieveAPIView):

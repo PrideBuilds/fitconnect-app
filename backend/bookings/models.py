@@ -1,5 +1,5 @@
 from django.db import models
-from django.core.validators import MinValueValidator
+from django.core.validators import MinValueValidator, MaxValueValidator
 from django.utils import timezone
 from decimal import Decimal
 
@@ -232,3 +232,85 @@ class Booking(models.Model):
         if self.status == 'confirmed' and self.is_past():
             self.status = 'no_show'
             self.save()
+
+
+class Review(models.Model):
+    """Client review and rating for a trainer after a completed session"""
+
+    # Relationships
+    booking = models.OneToOneField(
+        Booking,
+        on_delete=models.CASCADE,
+        related_name='review',
+        help_text="The booking being reviewed"
+    )
+    trainer = models.ForeignKey(
+        'trainers.TrainerProfile',
+        on_delete=models.CASCADE,
+        related_name='reviews'
+    )
+    client = models.ForeignKey(
+        'users.User',
+        on_delete=models.CASCADE,
+        related_name='reviews_written',
+        limit_choices_to={'role': 'client'}
+    )
+
+    # Review Content
+    rating = models.IntegerField(
+        validators=[MinValueValidator(1), MaxValueValidator(5)],
+        help_text="Rating from 1-5 stars"
+    )
+    comment = models.TextField(
+        blank=True,
+        help_text="Written review (optional)"
+    )
+
+    # Metadata
+    is_verified = models.BooleanField(
+        default=True,
+        help_text="Verified purchase (auto-set from booking)"
+    )
+    is_visible = models.BooleanField(
+        default=True,
+        help_text="Admin can hide inappropriate reviews"
+    )
+
+    # Timestamps
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        ordering = ['-created_at']
+        verbose_name = 'review'
+        verbose_name_plural = 'reviews'
+        indexes = [
+            models.Index(fields=['trainer', '-created_at']),
+            models.Index(fields=['client', '-created_at']),
+            models.Index(fields=['rating']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['booking'],
+                name='one_review_per_booking'
+            )
+        ]
+
+    def __str__(self):
+        return f"{self.rating}★ review by {self.client.email} for {self.trainer.user.email}"
+
+    def clean(self):
+        """Validate review data"""
+        from django.core.exceptions import ValidationError
+
+        # Ensure booking is completed
+        if self.booking.status != 'completed':
+            raise ValidationError("Can only review completed sessions")
+
+        # Ensure client is the one who made the booking
+        if self.booking.client != self.client:
+            raise ValidationError("Can only review your own bookings")
+
+        # Ensure trainer matches
+        if self.booking.trainer != self.trainer:
+            raise ValidationError("Trainer must match booking trainer")

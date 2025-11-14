@@ -33,6 +33,7 @@ export const ROUTES = {
   ADMIN_USERS: '/admin/users',
   ADMIN_TRAINERS: '/admin/trainers',
   ADMIN_BOOKINGS: '/admin/bookings',
+  ADMIN_REVIEWS: '/admin/reviews',
 }
 
 /**

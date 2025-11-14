@@ -4,6 +4,8 @@ import { GoogleMap, LoadScript, Marker, Circle } from '@react-google-maps/api'
 import { Button, Card, Badge } from '../components/ui'
 import AvailabilityDisplay from '../components/AvailabilityDisplay'
 import BookingModal from '../components/BookingModal'
+import ReviewCard from '../components/ReviewCard'
+import StarRating from '../components/StarRating'
 import { useAuth } from '../contexts/AuthContext'
 
 const GOOGLE_MAPS_API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY || ''
@@ -23,6 +25,8 @@ const TrainerDetail = () => {
   const [selectedPhotoIndex, setSelectedPhotoIndex] = useState(0)
   const [showBookingModal, setShowBookingModal] = useState(false)
   const [bookingSuccess, setBookingSuccess] = useState(false)
+  const [reviews, setReviews] = useState([])
+  const [reviewsLoading, setReviewsLoading] = useState(true)
 
   // Fetch trainer details
   useEffect(() => {
@@ -44,6 +48,32 @@ const TrainerDetail = () => {
     }
 
     fetchTrainer()
+  }, [id])
+
+  // Fetch trainer reviews
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const response = await fetch(`http://localhost:8000/api/v1/trainers/${id}/reviews/`)
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch reviews')
+        }
+
+        const data = await response.json()
+        setReviews(data.results || data)
+      } catch (err) {
+        console.error('Error fetching reviews:', err)
+        // Don't show error to user - just show no reviews
+        setReviews([])
+      } finally {
+        setReviewsLoading(false)
+      }
+    }
+
+    if (id) {
+      fetchReviews()
+    }
   }, [id])
 
   const handleBookingClick = () => {
@@ -353,12 +383,34 @@ const TrainerDetail = () => {
               </Card>
             )}
 
-            {/* Reviews Section (Placeholder) */}
+            {/* Reviews Section */}
             <Card>
-              <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                Reviews ({trainer.total_reviews})
-              </h2>
-              {trainer.total_reviews > 0 ? (
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold text-gray-900">
+                  Reviews ({trainer.total_reviews})
+                </h2>
+                {trainer.total_reviews > 0 && (
+                  <div className="flex items-center gap-2">
+                    <StarRating rating={parseFloat(trainer.average_rating)} readonly size="md" />
+                    <span className="text-lg font-semibold text-gray-900">
+                      {parseFloat(trainer.average_rating).toFixed(1)}
+                    </span>
+                  </div>
+                )}
+              </div>
+
+              {reviewsLoading ? (
+                <div className="text-center py-12">
+                  <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-primary-600"></div>
+                  <p className="mt-4 text-gray-600">Loading reviews...</p>
+                </div>
+              ) : reviews.length > 0 ? (
+                <div className="space-y-4">
+                  {reviews.map((review) => (
+                    <ReviewCard key={review.id} review={review} />
+                  ))}
+                </div>
+              ) : (
                 <div className="text-center py-12 text-gray-500">
                   <svg
                     className="w-16 h-16 mx-auto mb-4 text-gray-300"
@@ -373,10 +425,6 @@ const TrainerDetail = () => {
                       d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
                     />
                   </svg>
-                  <p>Reviews coming soon!</p>
-                </div>
-              ) : (
-                <div className="text-center py-12 text-gray-500">
                   <p>No reviews yet. Be the first to book and review!</p>
                 </div>
               )}

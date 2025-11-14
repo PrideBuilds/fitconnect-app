@@ -3,6 +3,7 @@ import { Card, Input, Button } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../routes'
+import UserDetailModal from '../../components/admin/UserDetailModal'
 
 /**
  * Admin Users Management
@@ -17,6 +18,11 @@ const AdminUsers = () => {
   const [error, setError] = useState(null)
   const [roleFilter, setRoleFilter] = useState('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedUserId, setSelectedUserId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
+  const [page, setPage] = useState(1)
+  const [totalCount, setTotalCount] = useState(0)
+  const [pageSize] = useState(20)
 
   // Check if user is admin
   useEffect(() => {
@@ -28,7 +34,12 @@ const AdminUsers = () => {
   // Fetch users
   useEffect(() => {
     fetchUsers()
-  }, [roleFilter, tokens])
+  }, [roleFilter, page, tokens])
+
+  // Reset to page 1 when filter changes
+  useEffect(() => {
+    setPage(1)
+  }, [roleFilter, searchQuery])
 
   const fetchUsers = async () => {
     try {
@@ -49,6 +60,10 @@ const AdminUsers = () => {
         params.append('search', searchQuery)
       }
 
+      // Add pagination parameters
+      params.append('page', page.toString())
+      params.append('page_size', pageSize.toString())
+
       if (params.toString()) {
         url += `?${params.toString()}`
       }
@@ -65,6 +80,7 @@ const AdminUsers = () => {
 
       const data = await response.json()
       setUsers(data.results)
+      setTotalCount(data.count)
     } catch (err) {
       setError(err.message)
     } finally {
@@ -75,6 +91,46 @@ const AdminUsers = () => {
   const handleSearch = (e) => {
     e.preventDefault()
     fetchUsers()
+  }
+
+  const handleViewDetails = (userId) => {
+    setSelectedUserId(userId)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedUserId(null)
+  }
+
+  const handleUserUpdated = () => {
+    // Refresh the users list
+    fetchUsers()
+  }
+
+  const handleExportCSV = () => {
+    // Use fetch to download with authentication
+    fetch('http://localhost:8000/api/v1/admin/export/users/', {
+      headers: {
+        'Authorization': `Bearer ${tokens.access}`,
+      },
+    })
+      .then(response => response.blob())
+      .then(blob => {
+        // Create a download link
+        const downloadUrl = window.URL.createObjectURL(blob)
+        const link = document.createElement('a')
+        link.href = downloadUrl
+        link.download = `users_export_${new Date().toISOString().split('T')[0]}.csv`
+        document.body.appendChild(link)
+        link.click()
+        link.remove()
+        window.URL.revokeObjectURL(downloadUrl)
+      })
+      .catch(error => {
+        console.error('Export failed:', error)
+        alert('Failed to export users. Please try again.')
+      })
   }
 
   const getRoleBadgeColor = (role) => {
@@ -127,12 +183,24 @@ const AdminUsers = () => {
               <h1 className="text-3xl font-bold text-gray-900">User Management</h1>
               <p className="text-gray-600 mt-1">Manage platform users and permissions</p>
             </div>
-            <button
-              onClick={() => navigate(ROUTES.ADMIN_DASHBOARD)}
-              className="text-gray-600 hover:text-gray-900"
-            >
-              ← Back to Dashboard
-            </button>
+            <div className="flex gap-3 items-center">
+              <Button
+                onClick={handleExportCSV}
+                variant="outline"
+                className="flex items-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+                Export CSV
+              </Button>
+              <button
+                onClick={() => navigate(ROUTES.ADMIN_DASHBOARD)}
+                className="text-gray-600 hover:text-gray-900"
+              >
+                ← Back to Dashboard
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -261,7 +329,10 @@ const AdminUsers = () => {
                         {new Date(u.date_joined).toLocaleDateString()}
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <button className="text-primary-600 hover:text-primary-700 text-sm font-medium">
+                        <button
+                          onClick={() => handleViewDetails(u.id)}
+                          className="text-primary-600 hover:text-primary-700 text-sm font-medium"
+                        >
                           View Details
                         </button>
                       </td>
@@ -271,8 +342,48 @@ const AdminUsers = () => {
               </tbody>
             </table>
           </div>
+
+          {/* Pagination */}
+          {totalCount > pageSize && (
+            <div className="border-t border-gray-200 px-6 py-4 flex items-center justify-between">
+              <div className="text-sm text-gray-600">
+                Showing {Math.min((page - 1) * pageSize + 1, totalCount)} to{' '}
+                {Math.min(page * pageSize, totalCount)} of {totalCount} users
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  onClick={() => setPage((prev) => Math.max(1, prev - 1))}
+                  disabled={page === 1}
+                  variant="outline"
+                  size="sm"
+                >
+                  Previous
+                </Button>
+                <div className="flex items-center px-4 text-sm font-medium text-gray-700">
+                  Page {page} of {Math.ceil(totalCount / pageSize)}
+                </div>
+                <Button
+                  onClick={() => setPage((prev) => prev + 1)}
+                  disabled={page >= Math.ceil(totalCount / pageSize)}
+                  variant="outline"
+                  size="sm"
+                >
+                  Next
+                </Button>
+              </div>
+            </div>
+          )}
         </Card>
       </div>
+
+      {/* User Detail Modal */}
+      <UserDetailModal
+        userId={selectedUserId}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onUserUpdated={handleUserUpdated}
+        tokens={tokens}
+      />
     </div>
   )
 }

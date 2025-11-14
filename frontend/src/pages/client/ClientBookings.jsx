@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Badge } from '../../components/ui'
+import ReviewForm from '../../components/ReviewForm'
 import { useAuth } from '../../contexts/AuthContext'
 
 /**
@@ -17,6 +18,8 @@ const ClientBookings = () => {
   const [filter, setFilter] = useState('all') // all, pending, confirmed, completed, cancelled
   const [cancellingBookingId, setCancellingBookingId] = useState(null)
   const [cancelReason, setCancelReason] = useState('')
+  const [reviewingBooking, setReviewingBooking] = useState(null)
+  const [reviewSuccess, setReviewSuccess] = useState(false)
 
   // Fetch bookings
   useEffect(() => {
@@ -137,6 +140,17 @@ const ClientBookings = () => {
     const hoursDifference = (sessionDateTime - now) / (1000 * 60 * 60)
 
     return hoursDifference >= 24
+  }
+
+  const handleReviewSuccess = (review) => {
+    setReviewingBooking(null)
+    setReviewSuccess(true)
+    fetchBookings() // Refresh to update review status
+
+    // Hide success message after 5 seconds
+    setTimeout(() => {
+      setReviewSuccess(false)
+    }, 5000)
   }
 
   if (loading) {
@@ -321,6 +335,17 @@ const ClientBookings = () => {
                       View Trainer
                     </Button>
 
+                    {/* Review Button for Completed Bookings */}
+                    {booking.status === 'completed' && (
+                      <Button
+                        variant="primary"
+                        size="sm"
+                        onClick={() => setReviewingBooking(booking)}
+                      >
+                        Write Review
+                      </Button>
+                    )}
+
                     {canCancelBooking(booking) && (
                       <>
                         {cancellingBookingId === booking.id ? (
@@ -379,6 +404,40 @@ const ClientBookings = () => {
           </div>
         )}
       </div>
+
+      {/* Success Message */}
+      {reviewSuccess && (
+        <div className="fixed bottom-4 right-4 bg-green-50 border-l-4 border-green-500 p-4 rounded shadow-lg z-50 max-w-md">
+          <div className="flex items-center">
+            <svg
+              className="w-6 h-6 text-green-500 mr-3"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+            <div>
+              <p className="font-semibold text-green-800">Review Submitted!</p>
+              <p className="text-sm text-green-700">Thank you for your feedback.</p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Review Form Modal */}
+      {reviewingBooking && (
+        <ReviewForm
+          booking={reviewingBooking}
+          onClose={() => setReviewingBooking(null)}
+          onSuccess={handleReviewSuccess}
+        />
+      )}
     </div>
   )
 }

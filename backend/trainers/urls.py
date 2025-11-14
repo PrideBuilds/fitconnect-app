@@ -11,6 +11,7 @@ from .views import (
     AvailabilitySlotDetailView,
     TrainerAvailabilityPublicView
 )
+from bookings.views import TrainerReviewsView
 
 app_name = 'trainers'
 
@@ -29,6 +30,9 @@ urlpatterns = [
 
     # Trainer Availability (public view)
     path('<int:trainer_id>/availability/', TrainerAvailabilityPublicView.as_view(), name='trainer-availability-public'),
+
+    # Trainer Reviews (public view)
+    path('<int:trainer_id>/reviews/', TrainerReviewsView.as_view(), name='trainer-reviews'),
 
     # Trainer Profile (authenticated)
     path('profile/', TrainerProfileView.as_view(), name='profile'),

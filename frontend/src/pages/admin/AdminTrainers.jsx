@@ -3,6 +3,7 @@ import { Card } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
 import { useNavigate } from 'react-router-dom'
 import { ROUTES } from '../../routes'
+import TrainerDetailModal from '../../components/admin/TrainerDetailModal'
 
 /**
  * Admin Trainer Approval
@@ -17,6 +18,8 @@ const AdminTrainers = () => {
   const [error, setError] = useState(null)
   const [filter, setFilter] = useState('pending') // 'all', 'pending', 'published'
   const [processingId, setProcessingId] = useState(null)
+  const [selectedTrainerId, setSelectedTrainerId] = useState(null)
+  const [isModalOpen, setIsModalOpen] = useState(false)
 
   // Check if user is admin
   useEffect(() => {
@@ -72,6 +75,21 @@ const AdminTrainers = () => {
     } finally {
       setLoading(false)
     }
+  }
+
+  const handleViewDetails = (trainerId) => {
+    setSelectedTrainerId(trainerId)
+    setIsModalOpen(true)
+  }
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false)
+    setSelectedTrainerId(null)
+  }
+
+  const handleTrainerUpdated = () => {
+    // Refresh the trainers list
+    fetchTrainers()
   }
 
   const handleApproveReject = async (trainerId, action) => {
@@ -282,6 +300,14 @@ const AdminTrainers = () => {
                   )}
                 </div>
 
+                {/* View Details Button */}
+                <button
+                  onClick={() => handleViewDetails(trainer.id)}
+                  className="w-full bg-primary-600 text-white px-4 py-2 rounded-lg font-medium hover:bg-primary-700 transition-colors mb-2"
+                >
+                  View Full Profile
+                </button>
+
                 {/* Actions */}
                 {!trainer.published && trainer.profile_complete && (
                   <div className="flex gap-2">
@@ -316,6 +342,15 @@ const AdminTrainers = () => {
           </div>
         )}
       </div>
+
+      {/* Trainer Detail Modal */}
+      <TrainerDetailModal
+        trainerId={selectedTrainerId}
+        isOpen={isModalOpen}
+        onClose={handleCloseModal}
+        onTrainerUpdated={handleTrainerUpdated}
+        tokens={tokens}
+      />
     </div>
   )
 }
