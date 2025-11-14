@@ -19,6 +19,9 @@ htmlcov/
 .coverage
 .pytest_cache/
 
+# Uploaded trainer photos (should be stored in S3/CDN in production)
+trainers/photos/
+
 # Environment
 .env
 .env.local
