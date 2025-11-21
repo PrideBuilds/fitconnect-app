@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { Button, Card, Badge } from '../../components/ui'
 import { useAuth } from '../../contexts/AuthContext'
+import api from '../../utils/api'
 
 /**
  * Trainer Bookings Dashboard
@@ -32,22 +33,12 @@ const TrainerBookings = () => {
         return
       }
 
-      let url = 'http://localhost:8000/api/v1/bookings/'
+      let endpoint = api.endpoints.BOOKINGS.LIST
       if (filter !== 'all') {
-        url += `?status=${filter}`
+        endpoint += `?status=${filter}`
       }
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch bookings')
-      }
-
-      const data = await response.json()
+      const data = await api.get(endpoint)
       setBookings(data.results || data)
     } catch (err) {
       setError(err.message)
@@ -66,22 +57,10 @@ const TrainerBookings = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/bookings/${bookingId}/`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'confirm',
-          trainer_notes: trainerNotes[bookingId] || '',
-        }),
+      await api.patch(api.endpoints.BOOKINGS.DETAIL(bookingId), {
+        action: 'confirm',
+        trainer_notes: trainerNotes[bookingId] || '',
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to confirm booking')
-      }
 
       alert('Booking confirmed successfully!')
       fetchBookings()
@@ -102,21 +81,9 @@ const TrainerBookings = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/bookings/${bookingId}/`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'complete',
-        }),
+      await api.patch(api.endpoints.BOOKINGS.DETAIL(bookingId), {
+        action: 'complete',
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to mark as completed')
-      }
 
       alert('Booking marked as completed!')
       fetchBookings()
@@ -137,21 +104,9 @@ const TrainerBookings = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/bookings/${bookingId}/`, {
-        method: 'PATCH',
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          action: 'no_show',
-        }),
+      await api.patch(api.endpoints.BOOKINGS.DETAIL(bookingId), {
+        action: 'no_show',
       })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to mark as no-show')
-      }
 
       alert('Booking marked as no-show')
       fetchBookings()

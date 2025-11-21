@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Button, Card, Badge } from '../../components/ui'
 import ReviewForm from '../../components/ReviewForm'
 import { useAuth } from '../../contexts/AuthContext'
+import api from '../../utils/api'
 
 /**
  * Client Bookings Dashboard
@@ -37,22 +38,12 @@ const ClientBookings = () => {
       }
 
       // Build URL with filter
-      let url = 'http://localhost:8000/api/v1/bookings/'
+      let endpoint = api.endpoints.BOOKINGS.LIST
       if (filter !== 'all') {
-        url += `?status=${filter}`
+        endpoint += `?status=${filter}`
       }
 
-      const response = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch bookings')
-      }
-
-      const data = await response.json()
+      const data = await api.get(endpoint)
       setBookings(data.results || data)
     } catch (err) {
       setError(err.message)
@@ -68,19 +59,7 @@ const ClientBookings = () => {
         return
       }
 
-      const response = await fetch(`http://localhost:8000/api/v1/bookings/${bookingId}/`, {
-        method: 'DELETE',
-        headers: {
-          Authorization: `Bearer ${tokens.access}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ reason: cancelReason }),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to cancel booking')
-      }
+      await api.delete(api.endpoints.BOOKINGS.DETAIL(bookingId))
 
       // Refresh bookings
       fetchBookings()
@@ -325,6 +304,43 @@ const ClientBookings = () => {
 
                   {/* Actions */}
                   <div className="flex flex-col gap-2 md:min-w-[200px]">
+                    {/* Payment Status Badge */}
+                    {booking.payment_status && (
+                      <div className="mb-2">
+                        <Badge
+                          variant={
+                            booking.payment_status === 'paid'
+                              ? 'success'
+                              : booking.payment_status === 'failed'
+                              ? 'error'
+                              : 'warning'
+                          }
+                          className="w-full justify-center"
+                        >
+                          {booking.payment_status === 'paid' && '✓ Paid'}
+                          {booking.payment_status === 'unpaid' && 'Payment Required'}
+                          {booking.payment_status === 'pending' && 'Payment Pending'}
+                          {booking.payment_status === 'failed' && 'Payment Failed'}
+                          {booking.payment_status === 'refunded' && 'Refunded'}
+                        </Badge>
+                      </div>
+                    )}
+
+                    {/* Pay Now Button for Unpaid Bookings */}
+                    {booking.payment_status &&
+                      booking.payment_status !== 'paid' &&
+                      booking.payment_status !== 'refunded' &&
+                      booking.status !== 'cancelled_by_client' &&
+                      booking.status !== 'cancelled_by_trainer' && (
+                        <Button
+                          variant="primary"
+                          size="sm"
+                          onClick={() => navigate(`/payment/${booking.id}`)}
+                        >
+                          Pay Now
+                        </Button>
+                      )}
+
                     <Button
                       variant="outline"
                       size="sm"

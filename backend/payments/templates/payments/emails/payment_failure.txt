@@ -1,0 +1,44 @@
+Payment Failed - Action Required
+
+Hi {{ client_name }},
+
+We were unable to process your payment for the training session with {{ trainer_name }}.
+
+PAYMENT DETAILS
+---------------
+Amount: ${{ payment_amount }} {{ currency }}
+Booking ID: #{{ booking_id }}
+Session Date: {{ session_date|date:"F d, Y" }}
+Session Time: {{ start_time }}
+
+{% if error_message %}
+REASON FOR FAILURE
+------------------
+{{ error_message }}
+{% endif %}
+
+WHAT TO DO NEXT
+---------------
+1. Check your payment method details
+2. Ensure you have sufficient funds
+3. Try a different payment method if needed
+4. Complete your payment to confirm your booking
+
+{% if failure_code %}
+Error Code: {{ failure_code }}
+{% endif %}
+
+RETRY PAYMENT
+-------------
+You can retry your payment at:
+{{ payment_url }}
+
+Your booking is currently on hold. Please complete the payment soon to confirm your session with {{ trainer_name }}.
+
+Need help? Contact our support team or reach out to {{ trainer_name }} directly.
+
+{{ site_name }}
+{{ site_url }}
+
+---
+This email was sent to {{ client_email }} regarding your booking on {{ site_name }}.

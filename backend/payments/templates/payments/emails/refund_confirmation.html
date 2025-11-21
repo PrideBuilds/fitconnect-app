@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        body { font-family: Arial, sans-serif; line-height: 1.6; color: #333; max-width: 600px; margin: 0 auto; padding: 20px; }
+        .header { background: #10b981; color: white; padding: 30px; text-align: center; border-radius: 10px 10px 0 0; }
+        .content { background: #ffffff; padding: 30px; border: 1px solid #e0e0e0; border-top: none; }
+        .detail-box { background: #f7f7f7; border-left: 4px solid #10b981; padding: 15px; margin: 20px 0; border-radius: 4px; }
+        .detail-row { display: flex; justify-content: space-between; padding: 8px 0; border-bottom: 1px solid #e0e0e0; }
+        .detail-row:last-child { border-bottom: none; }
+        .footer { text-align: center; padding: 20px; color: #666; font-size: 14px; background: #f7f7f7; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1 style="margin: 0;">Refund Processed</h1>
+        <div style="font-size: 36px; font-weight: bold; margin: 10px 0;">${{ refund_amount }}</div>
+    </div>
+
+    <div class="content">
+        <p>Hi <strong>{{ client_name }}</strong>,</p>
+        <p>Your refund for the training session with <strong>{{ trainer_name }}</strong> has been processed.</p>
+
+        <div class="detail-box">
+            <h3 style="margin-top: 0;">Refund Details</h3>
+            <div class="detail-row">
+                <span><strong>Refund Amount:</strong></span>
+                <span>${{ refund_amount }} {{ currency }}</span>
+            </div>
+            <div class="detail-row">
+                <span><strong>Original Payment:</strong></span>
+                <span>${{ original_amount }} {{ currency }}</span>
+            </div>
+            <div class="detail-row">
+                <span><strong>Refund To:</strong></span>
+                <span>{{ card_brand }} •••• {{ card_last4 }}</span>
+            </div>
+            <div class="detail-row">
+                <span><strong>Reason:</strong></span>
+                <span>{{ refund_reason }}</span>
+            </div>
+        </div>
+
+        <p style="background: #ecfdf5; padding: 15px; border-radius: 4px;">
+            ⏱ <strong>Processing Time:</strong> Refunds typically appear in your account within {{ refund_processing_days }} business days.
+        </p>
+
+        <p style="color: #666; font-size: 14px;">
+            Questions? Contact our <a href="{{ site_url }}/support">support team</a>.
+        </p>
+    </div>
+
+    <div class="footer">
+        <p><strong>{{ site_name }}</strong></p>
+        <p><a href="{{ site_url }}">{{ site_url }}</a></p>
+    </div>
+</body>
+</html>

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { Button, Card } from '../ui'
+import api from '../../utils/api'
 
 /**
  * Availability Manager Component
@@ -37,20 +38,7 @@ const AvailabilityManager = () => {
   const fetchAvailability = async () => {
     try {
       setLoading(true)
-      const token = localStorage.getItem('token')
-
-      const response = await fetch('http://localhost:8000/api/v1/trainers/availability/', {
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-      })
-
-      if (!response.ok) {
-        throw new Error('Failed to fetch availability')
-      }
-
-      const data = await response.json()
+      const data = await api.get(api.endpoints.AVAILABILITY.LIST)
       setSlots(data)
     } catch (err) {
       setError(err.message)
@@ -65,23 +53,7 @@ const AvailabilityManager = () => {
     setError(null)
 
     try {
-      const token = localStorage.getItem('token')
-
-      const response = await fetch('http://localhost:8000/api/v1/trainers/availability/', {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(newSlot),
-      })
-
-      if (!response.ok) {
-        const errorData = await response.json()
-        throw new Error(errorData.error || 'Failed to add availability slot')
-      }
-
-      const data = await response.json()
+      const data = await api.post(api.endpoints.AVAILABILITY.LIST, newSlot)
       setSlots([...slots, data])
 
       // Reset form
@@ -104,23 +76,7 @@ const AvailabilityManager = () => {
     }
 
     try {
-      const token = localStorage.getItem('token')
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/trainers/availability/${slotId}/`,
-        {
-          method: 'DELETE',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to delete slot')
-      }
-
+      await api.delete(api.endpoints.AVAILABILITY.DETAIL(slotId))
       setSlots(slots.filter((slot) => slot.id !== slotId))
     } catch (err) {
       setError(err.message)
@@ -129,27 +85,9 @@ const AvailabilityManager = () => {
 
   const handleToggleSlot = async (slot) => {
     try {
-      const token = localStorage.getItem('token')
-
-      const response = await fetch(
-        `http://localhost:8000/api/v1/trainers/availability/${slot.id}/`,
-        {
-          method: 'PATCH',
-          headers: {
-            'Authorization': `Bearer ${token}`,
-            'Content-Type': 'application/json',
-          },
-          body: JSON.stringify({
-            is_available: !slot.is_available,
-          }),
-        }
-      )
-
-      if (!response.ok) {
-        throw new Error('Failed to update slot')
-      }
-
-      const data = await response.json()
+      const data = await api.patch(api.endpoints.AVAILABILITY.DETAIL(slot.id), {
+        is_available: !slot.is_available,
+      })
       setSlots(slots.map((s) => (s.id === slot.id ? data : s)))
     } catch (err) {
       setError(err.message)

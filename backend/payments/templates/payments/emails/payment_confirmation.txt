@@ -1,0 +1,42 @@
+Payment Confirmed - {{ site_name }}
+
+Hi {{ client_name }},
+
+Great news! Your payment for the training session with {{ trainer_name }} has been successfully processed.
+
+PAYMENT DETAILS
+---------------
+Amount Paid: ${{ payment_amount }} {{ currency }}
+Payment ID: #{{ payment_id }}
+Payment Method: {{ card_brand }} ending in {{ card_last4 }}
+Payment Date: {{ payment_date|date:"F d, Y at g:i A" }}
+
+SESSION DETAILS
+---------------
+Trainer: {{ trainer_name }}
+Date: {{ session_date|date:"l, F d, Y" }}
+Time: {{ start_time }} - {{ end_time }}
+Duration: {{ duration_minutes }} minutes
+Location: {{ location_address }}
+
+{% if receipt_url %}
+Your receipt is available at:
+{{ receipt_url }}
+{% endif %}
+
+WHAT'S NEXT?
+------------
+- Your booking is now confirmed
+- {{ trainer_name }} has been notified
+- You'll receive a reminder 24 hours before your session
+
+Questions or need to make changes? Visit your bookings dashboard:
+{{ site_url }}/client/bookings
+
+Thanks for using {{ site_name }}!
+Your FitConnect Team
+
+---
+This email was sent to {{ client_email }} because you made a payment on {{ site_name }}.
+
+{{ site_url }}

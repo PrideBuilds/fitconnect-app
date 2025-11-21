@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     'users',
     'trainers',
     'bookings',
+    'payments',
 ]
 
 MIDDLEWARE = [
@@ -135,6 +136,13 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
+# Media files (User uploads - photos, certifications, etc.)
+# https://docs.djangoproject.com/en/4.2/topics/files/
+
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -163,6 +171,8 @@ REST_FRAMEWORK = {
     ],
     'DEFAULT_PARSER_CLASSES': [
         'rest_framework.parsers.JSONParser',
+        'rest_framework.parsers.MultiPartParser',  # For file uploads
+        'rest_framework.parsers.FormParser',  # For form data
     ],
 }
 
@@ -191,6 +201,15 @@ SIMPLE_JWT = {
 # Third-Party API Keys
 # Google Maps API for geocoding and Places Autocomplete
 GOOGLE_MAPS_API_KEY = config('GOOGLE_MAPS_API_KEY', default='')
+
+# Stripe Payment Processing
+STRIPE_SECRET_KEY = config('STRIPE_SECRET_KEY', default='')
+STRIPE_PUBLISHABLE_KEY = config('STRIPE_PUBLISHABLE_KEY', default='')
+STRIPE_WEBHOOK_SECRET = config('STRIPE_WEBHOOK_SECRET', default='')
+
+# Stream Chat (Messaging)
+STREAM_API_KEY = config('STREAM_API_KEY', default='')
+STREAM_API_SECRET = config('STREAM_API_SECRET', default='')
 
 # Email Configuration
 # For development, use Django's console backend to print emails to console

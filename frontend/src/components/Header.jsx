@@ -67,8 +67,9 @@ const Header = () => {
   // Public navigation items
   const publicNavItems = [
     { label: 'Find Trainers', path: ROUTES.SEARCH_TRAINERS },
+    { label: 'How It Works', path: ROUTES.HOW_IT_WORKS },
+    { label: 'For Trainers', path: ROUTES.FOR_TRAINERS },
     { label: 'About', path: ROUTES.ABOUT },
-    { label: 'Help', path: ROUTES.HELP },
   ]
 
   const navItems = isAuthenticated ? getAuthenticatedNavItems() : publicNavItems

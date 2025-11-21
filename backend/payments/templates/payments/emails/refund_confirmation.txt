@@ -1,0 +1,37 @@
+Refund Processed - {{ site_name }}
+
+Hi {{ client_name }},
+
+Your refund for the training session with {{ trainer_name }} has been processed.
+
+REFUND DETAILS
+--------------
+Refund Amount: ${{ refund_amount }} {{ currency }}
+Original Payment: ${{ original_amount }} {{ currency }}
+Payment ID: #{{ payment_id }}
+Refund To: {{ card_brand }} ending in {{ card_last4 }}
+
+SESSION DETAILS
+---------------
+Trainer: {{ trainer_name }}
+Session Date: {{ session_date|date:"F d, Y" }}
+Booking ID: #{{ booking_id }}
+
+REASON
+------
+{{ refund_reason }}
+
+PROCESSING TIME
+---------------
+Refunds typically appear in your account within {{ refund_processing_days }} business days, depending on your bank or card issuer.
+
+Questions? Contact our support team or visit:
+{{ site_url }}/client/bookings
+
+Thanks for using {{ site_name }}!
+Your FitConnect Team
+
+---
+This email was sent to you regarding your refund on {{ site_name }}.
+
+{{ site_url }}

@@ -8,6 +8,9 @@ export const ROUTES = {
   HOME: '/',
   LOGIN: '/login',
   REGISTER: '/register',
+  VERIFY_EMAIL: '/verify-email/:token',
+  FORGOT_PASSWORD: '/forgot-password',
+  RESET_PASSWORD: '/reset-password/:token',
 
   // Client routes
   CLIENT_DASHBOARD: '/client/dashboard',
@@ -15,6 +18,10 @@ export const ROUTES = {
   CLIENT_BOOKINGS: '/client/bookings',
   SEARCH_TRAINERS: '/search',
   TRAINER_DETAIL: '/trainers/:id',
+
+  // Payment routes
+  BOOKING_PAYMENT: '/payment/:bookingId',
+  PAYMENT_CONFIRMATION: '/payment/confirmation',
 
   // Trainer routes
   TRAINER_DASHBOARD: '/trainer/dashboard',
@@ -27,6 +34,17 @@ export const ROUTES = {
   PROFILE_SETTINGS: '/settings',
   HELP: '/help',
   ABOUT: '/about',
+  CHAT: '/chat',
+
+  // Additional pages
+  HOW_IT_WORKS: '/how-it-works',
+  FOR_TRAINERS: '/for-trainers',
+  REVIEWS: '/reviews',
+  PRICING: '/pricing',
+  TRAINER_RESOURCES: '/trainer-resources',
+  CONTACT: '/contact',
+  PRIVACY: '/privacy',
+  TERMS: '/terms',
 
   // Admin routes
   ADMIN_DASHBOARD: '/admin/dashboard',

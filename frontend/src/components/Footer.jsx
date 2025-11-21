@@ -31,18 +31,23 @@ const Footer = () => {
                 </Link>
               </li>
               <li>
+                <Link to={ROUTES.HOW_IT_WORKS} className="text-gray-300 hover:text-white transition-colors">
+                  How It Works
+                </Link>
+              </li>
+              <li>
                 <Link to={ROUTES.SEARCH_TRAINERS} className="text-gray-300 hover:text-white transition-colors">
                   Find Trainers
                 </Link>
               </li>
               <li>
-                <Link to={ROUTES.ABOUT} className="text-gray-300 hover:text-white transition-colors">
-                  About Us
+                <Link to={ROUTES.REVIEWS} className="text-gray-300 hover:text-white transition-colors">
+                  Reviews
                 </Link>
               </li>
               <li>
-                <Link to={ROUTES.HELP} className="text-gray-300 hover:text-white transition-colors">
-                  Help Center
+                <Link to={ROUTES.ABOUT} className="text-gray-300 hover:text-white transition-colors">
+                  About Us
                 </Link>
               </li>
             </ul>
@@ -53,19 +58,24 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">For Trainers</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <Link to={ROUTES.REGISTER} className="text-gray-300 hover:text-white transition-colors">
-                  Become a Trainer
+                <Link to={ROUTES.FOR_TRAINERS} className="text-gray-300 hover:text-white transition-colors">
+                  Why FitConnect
                 </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={ROUTES.TRAINER_RESOURCES} className="text-gray-300 hover:text-white transition-colors">
                   Trainer Resources
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  Success Stories
-                </a>
+                <Link to={ROUTES.PRICING} className="text-gray-300 hover:text-white transition-colors">
+                  Pricing
+                </Link>
+              </li>
+              <li>
+                <Link to={ROUTES.REGISTER} className="text-gray-300 hover:text-white transition-colors">
+                  Become a Trainer
+                </Link>
               </li>
             </ul>
           </div>
@@ -75,24 +85,24 @@ const Footer = () => {
             <h3 className="text-lg font-semibold mb-4">Legal & Support</h3>
             <ul className="space-y-2 text-sm">
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  Terms of Service
-                </a>
+                <Link to={ROUTES.HELP} className="text-gray-300 hover:text-white transition-colors">
+                  Help Center
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  Privacy Policy
-                </a>
-              </li>
-              <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
+                <Link to={ROUTES.CONTACT} className="text-gray-300 hover:text-white transition-colors">
                   Contact Us
-                </a>
+                </Link>
               </li>
               <li>
-                <a href="#" className="text-gray-300 hover:text-white transition-colors">
-                  FAQ
-                </a>
+                <Link to={ROUTES.TERMS} className="text-gray-300 hover:text-white transition-colors">
+                  Terms of Service
+                </Link>
+              </li>
+              <li>
+                <Link to={ROUTES.PRIVACY} className="text-gray-300 hover:text-white transition-colors">
+                  Privacy Policy
+                </Link>
               </li>
             </ul>
           </div>

@@ -242,3 +242,68 @@ class TrainerProfileUpdateView(generics.RetrieveUpdateAPIView):
         # Return the trainer profile for the current user
         profile, created = TrainerProfile.objects.get_or_create(user=self.request.user)
         return profile
+
+
+class StreamChatTokenView(APIView):
+    """
+    Generate Stream Chat token for authenticated user
+    GET /api/v1/users/stream-token/
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def get(self, request):
+        from .stream_chat import create_stream_token, create_or_update_stream_user
+
+        try:
+            # Create/update user in Stream Chat
+            stream_user = create_or_update_stream_user(request.user)
+
+            # Generate token
+            token = create_stream_token(request.user.id)
+
+            return Response({
+                'token': token,
+                'user_id': str(request.user.id),
+                'user': stream_user
+            }, status=status.HTTP_200_OK)
+
+        except Exception as e:
+            return Response({
+                'error': f'Failed to generate Stream token: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+class CreateChatChannelView(APIView):
+    """
+    Create a chat channel between client and trainer
+    POST /api/v1/users/create-chat-channel/
+    """
+    permission_classes = (permissions.IsAuthenticated,)
+
+    def post(self, request):
+        from .stream_chat import create_channel_between_users
+
+        other_user_id = request.data.get('user_id')
+
+        if not other_user_id:
+            return Response({
+                'error': 'user_id is required'
+            }, status=status.HTTP_400_BAD_REQUEST)
+
+        try:
+            # Get the other user
+            other_user = User.objects.get(id=other_user_id)
+
+            # Create channel
+            channel_data = create_channel_between_users(request.user, other_user)
+
+            return Response(channel_data, status=status.HTTP_200_OK)
+
+        except User.DoesNotExist:
+            return Response({
+                'error': 'User not found'
+            }, status=status.HTTP_404_NOT_FOUND)
+        except Exception as e:
+            return Response({
+                'error': f'Failed to create channel: {str(e)}'
+            }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

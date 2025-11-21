@@ -24,4 +24,8 @@ urlpatterns = [
     path('profiles/client/', views.ClientProfileView.as_view(), name='client_profile'),
     path('profiles/trainer/me/', views.TrainerProfileUpdateView.as_view(), name='trainer_profile_update'),
     path('profiles/trainer/<int:id>/', views.TrainerProfileDetailView.as_view(), name='trainer_profile_detail'),
+
+    # Stream Chat endpoints
+    path('stream-token/', views.StreamChatTokenView.as_view(), name='stream_token'),
+    path('create-chat-channel/', views.CreateChatChannelView.as_view(), name='create_chat_channel'),
 ]

@@ -16,6 +16,14 @@ class Booking(models.Model):
         ('no_show', 'No Show'),
     ]
 
+    PAYMENT_STATUS_CHOICES = [
+        ('unpaid', 'Unpaid - Payment not initiated'),
+        ('pending', 'Pending - Payment in progress'),
+        ('paid', 'Paid - Payment successful'),
+        ('failed', 'Failed - Payment unsuccessful'),
+        ('refunded', 'Refunded - Payment refunded'),
+    ]
+
     # Relationships
     trainer = models.ForeignKey(
         'trainers.TrainerProfile',
@@ -61,6 +69,12 @@ class Booking(models.Model):
         max_length=30,
         choices=STATUS_CHOICES,
         default='pending'
+    )
+    payment_status = models.CharField(
+        max_length=20,
+        choices=PAYMENT_STATUS_CHOICES,
+        default='unpaid',
+        help_text="Payment status for this booking"
     )
 
     # Client Notes
@@ -232,6 +246,29 @@ class Booking(models.Model):
         if self.status == 'confirmed' and self.is_past():
             self.status = 'no_show'
             self.save()
+
+    def mark_paid(self):
+        """Mark booking as paid"""
+        self.payment_status = 'paid'
+        self.save()
+
+    def mark_payment_failed(self):
+        """Mark payment as failed"""
+        self.payment_status = 'failed'
+        self.save()
+
+    def mark_refunded(self):
+        """Mark payment as refunded"""
+        self.payment_status = 'refunded'
+        self.save()
+
+    def is_paid(self):
+        """Check if booking is paid"""
+        return self.payment_status == 'paid'
+
+    def requires_payment(self):
+        """Check if booking requires payment"""
+        return self.payment_status in ['unpaid', 'failed']
 
 
 class Review(models.Model):
